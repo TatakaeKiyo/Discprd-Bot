@@ -113,6 +113,37 @@ client.on('message', async message => {
             message.channel.send('У вас нет прав для выполнения этой команды.');
         }
     }
+
+    // if (message.content.startsWith('!Lesson')) {
+    //     if (!message.member.permissions.has('MANAGE_CHANNELS')) {
+    //         return message.reply('У вас нет прав для выполнения этой команды.');
+    //     }
+
+    //     const url = args[0]; 
+    //     const comment = args.slice(1).join(' '); 
+    //     const targetChannelName = args[args.length - 1]; 
+
+    //     // Check if all arguments are provided
+    //     if (!url || !comment || !targetChannelName) {
+    //         return message.reply('Используйте: !lesson <ссылка> <комментарий> <название_канала>');
+    //     }
+
+    //     const targetChannel = message.guild.channels.cache.find(channel => channel.name === targetChannelName);
+    //     if (!targetChannel) {
+    //         return message.reply(`Канал "${targetChannelName}" не найден.`);
+    //     }
+
+        
+    //     const embed = new MessageEmbed()
+    //         .setTitle('Урок')
+    //         .setURL(url) 
+    //         .setDescription(comment) 
+    //         .setColor('#0099ff');
+
+    //     targetChannel.send({ embeds: [embed] })
+    //         .then(() => message.reply(`Ссылка успешно отправлена в канал "${targetChannelName}"`))
+    //         .catch(error => console.error(`Ошибка отправки ссылки: ${error}`));
+    // } В разработке в будущем) Если не сопьюсь
 })
 
 client.login(
