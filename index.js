@@ -33,7 +33,7 @@ client.on('message', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (command === '!test') {
+    if (message.content.startsWith('!test')) {
         const question = args[0];
         const options = args.slice(1);
     
@@ -172,6 +172,7 @@ client.on('message', async message => {
     //         .catch(error => console.error(`Ошибка отправки ссылки: ${error}`));
     // } В разработке в будущем) Если не сопьюсь
 })
+
 
 client.login(
     ""
