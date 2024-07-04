@@ -39,35 +39,43 @@ client.on('message', async message => {
     }
 
     if (message.content.startsWith('!createchannel')) {
-        if (!message.member.hasPermission('MANAGE_CHANNELS')) {
+        if (!message.member.permissions.has('MANAGE_CHANNELS')) {
             return message.reply('У вас нет прав на создание каналов.');
         }
-
+    
         const roleName = args[0];
         const role = message.guild.roles.cache.find(r => r.name === roleName);
-        
+    
         if (!role) {
             return message.reply('Роль не найдена.');
         }
-
+    
         message.guild.channels.create(roleName, {
             type: 'text',
             permissionOverwrites: [
                 {
-                    id: role.id,
-                    allow: ['VIEW_CHANNEL']
+                    id: message.guild.id, // Разрешаем доступ всем на сервере
+                    deny: ['VIEW_CHANNEL'] // Запрещаем просматривать канал
+                },
+                {
+                    id: role.id, // Разрешаем доступ только указанной роли
+                    allow: ['VIEW_CHANNEL', 'SEND_MESSAGES']
                 }
             ]
         })
         .then(channel => message.channel.send(`Канал для роли ${roleName} создан: ${channel}`))
         .catch(console.error);
-
+    
         message.guild.channels.create(roleName, {
             type: 'voice',
             permissionOverwrites: [
                 {
-                    id: role.id,
-                    allow: ['VIEW_CHANNEL']
+                    id: message.guild.id, // Разрешаем доступ всем на сервере
+                    deny: ['VIEW_CHANNEL'] // Запрещаем просматривать канал
+                },
+                {
+                    id: role.id, // Разрешаем доступ только указанной роли
+                    allow: ['VIEW_CHANNEL', 'CONNECT']
                 }
             ]
         })
