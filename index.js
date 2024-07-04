@@ -74,6 +74,40 @@ client.on('message', async message => {
         .then(channel => message.channel.send(`Канал для роли ${roleName} создан: ${channel}`))
         .catch(console.error);
     }
+
+    if (message.content.startsWith('!getRole')) {
+        if (message.member.permissions.has('ADMINISTRATOR')) {
+            // Разбираем аргументы команды
+            const args = message.content.split(' ');
+            const roleName = args[1]; // Название роли
+            const memberToGiveRole = message.mentions.members.first(); // Пользователь, которому выдавать роль
+
+            if (!roleName) {
+                message.channel.send('Укажите имя роли!');
+                return;
+            }
+
+            if (!memberToGiveRole) {
+                message.channel.send('Укажите пользователя, которому выдать роль!');
+                return;
+            }
+
+            const randomColor = Math.floor(Math.random() * 16777215).toString(16); // 16777215 - максимальное значение для цвета в шестнадцатеричной системе
+
+            // Создаем роль
+            const role = await message.guild.roles.create({
+                data: {
+                    name: roleName,
+                    color: `#${randomColor}` // Добавляем '#' в начало для формата hex цвета
+                }})
+            // Выдаем роль пользователю
+            await memberToGiveRole.roles.add(role);
+            message.channel.send(`Роль "${roleName}" была выдана пользователю ${memberToGiveRole}`);
+
+        } else {
+            message.channel.send('У вас нет прав для выполнения этой команды.');
+        }
+    }
 });
 
 client.login(
