@@ -38,7 +38,7 @@ client.on('message', async message => {
             });
     }
 
-    if (command === '!createchannel') {
+    if (message.content.startsWith('!createchannel')) {
         if (!message.member.hasPermission('MANAGE_CHANNELS')) {
             return message.reply('У вас нет прав на создание каналов.');
         }
