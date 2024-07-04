@@ -14,7 +14,7 @@ client.on('message', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (command === 'test') {
+    if (command === '!test') {
         const question = args[0];
         const options = args.slice(1);
     
@@ -38,7 +38,7 @@ client.on('message', async message => {
             });
     }
 
-    if (command === 'createchannel') {
+    if (command === '!createchannel') {
         if (!message.member.hasPermission('MANAGE_CHANNELS')) {
             return message.reply('У вас нет прав на создание каналов.');
         }
@@ -80,15 +80,15 @@ client.on('message', async message => {
             // Разбираем аргументы команды
             const args = message.content.split(' ');
             const roleName = args[1]; // Название роли
-            const memberToGiveRole = message.mentions.members.first(); // Пользователь, которому выдавать роль
+            const mentionedMembers = message.mentions.members.array(); // Массив упомянутых пользователей
 
             if (!roleName) {
                 message.channel.send('Укажите имя роли!');
                 return;
             }
 
-            if (!memberToGiveRole) {
-                message.channel.send('Укажите пользователя, которому выдать роль!');
+            if (mentionedMembers.length === 0) {
+                message.channel.send('Укажите пользователей, которым выдать роль!');
                 return;
             }
 
@@ -99,16 +99,21 @@ client.on('message', async message => {
                 data: {
                     name: roleName,
                     color: `#${randomColor}` // Добавляем '#' в начало для формата hex цвета
-                }})
-            // Выдаем роль пользователю
-            await memberToGiveRole.roles.add(role);
-            message.channel.send(`Роль "${roleName}" была выдана пользователю ${memberToGiveRole}`);
+                }
+            });
+
+            // Выдаем роль всем упомянутым пользователям
+            for (const member of mentionedMembers) {
+                await member.roles.add(role);
+            }
+
+            message.channel.send(`Роль "${roleName}" была выдана ${mentionedMembers.length} пользователям.`);
 
         } else {
             message.channel.send('У вас нет прав для выполнения этой команды.');
         }
     }
-});
+})
 
 client.login(
     ""
