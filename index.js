@@ -1,24 +1,23 @@
 const Discord = require('discord.js');
 const client = new Discord.Client();
+const { diff } = require('deep-diff');
+const prefix = '/';
+// const assignments = {};
+// let currentAssignment = null;
 
-const prefix = '!';
-
-const commands = {
-    '!test': 'Создать тест с вариантами ответов: !test <вопрос> <вариант1> <вариант2> ...',
-    '!createchannel': 'Создать текстовый и голосовой канал для роли: !createchannel <имя роли>',
-    '!getRole': 'Создать и выдать роль упомянутым пользователям: !getRole <имя роли> @пользователь1 @пользователь2 ...'
-};
-
+    const commands = {
+        '/test': 'Создать тест с вариантами ответов: !test <вопрос> <вариант1> <вариант2> ...',
+        '/createchannel': 'Создать текстовый и голосовой канал для роли: !createchannel <имя роли>',
+        '/getRole': 'Создать и выдать роль упомянутым пользователям: !getRole <имя роли> @пользователь1 @пользователь2 ...'
+    };
 
 client.on('ready', () => {
     console.log('Bot Ready!');
 });
 
-
 client.on('message', async message => {
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
-
     if (message.content === prefix) {
         // Выводим подсказку с командами
         const embed = new Discord.MessageEmbed()
@@ -33,7 +32,7 @@ client.on('message', async message => {
     const args = message.content.slice(prefix.length).trim().split(/ +/);
     const command = args.shift().toLowerCase();
 
-    if (message.content.startsWith('!test')) {
+    if (command === 'test') {
         const question = args[0];
         const options = args.slice(1);
 
@@ -57,7 +56,7 @@ client.on('message', async message => {
             });
     }
 
-    if (message.content.startsWith('!createchannel')) {
+    if (command === 'createchannel') {
         if (!message.member.permissions.has('MANAGE_CHANNELS')) {
             return message.reply('У вас нет прав на создание каналов.');
         }
@@ -102,7 +101,7 @@ client.on('message', async message => {
             .catch(console.error);
     }
 
-    if (message.content.startsWith('!getRole')) {
+    if (command === 'createrole'){
         if (message.member.permissions.has('ADMINISTRATOR')) {
             // Разбираем аргументы команды
             const args = message.content.split(' ');
@@ -164,7 +163,81 @@ client.on('message', async message => {
 
         channel.send(embed);
     }
-})
+
+    if (command === 'getrole') {
+        if (!message.member.permissions.has('MANAGE_ROLES')) {
+            return message.reply('У вас нет прав для выполнения этой команды.');
+        }
+
+        const roleName = args[0]; // Имя роли
+        const mentionedMembers = message.mentions.members.array(); // Массив упомянутых пользователей
+
+        if (!roleName) {
+            return message.reply('Укажите имя роли!');
+        }
+
+        if (mentionedMembers.length === 0) {
+            return message.reply('Укажите пользователей, которым выдать роль!');
+        }
+
+        const role = message.guild.roles.cache.find(r => r.name === roleName); // Находим роль по имени
+
+        if (!role) {
+            return message.reply(`Роль "${roleName}" не найдена.`);
+        }
+
+        // Выдаем роль всем упомянутым пользователям
+        for (const member of mentionedMembers) {
+            await member.roles.add(role);
+        }
+
+        message.channel.send(`Роль "${roleName}" была выдана ${mentionedMembers.length} пользователям.`);
+    }
+    //     if (command === 'set_assignment') {
+    //     handleSetAssignment(message, args);
+    //   } else if (command === 'submit') {
+    //     handleSubmit(message, args);
+    //   } else if (command === 'clear_assignment') {
+    //     handleClearAssignment(message);
+    //   }
+    });
+    
+//     async function handleSetAssignment(message, args) {
+//       const assignmentText = args.join(' ');
+//       assignments[message.author.id] = assignmentText;
+    
+//       await message.reply('Задание установлено!');
+//     }
+    
+//     async function handleSubmit(message, args) {
+//       const submissionText = args.join(' ');
+//       const authorId = message.author.id;
+    
+//       if (authorId in assignments) {
+//         const assignment = assignments[authorId];
+    
+//         const differences = diff(assignment, submissionText);
+    
+//         if (differences) {
+//           // Вывод подсказки с информацией о различиях
+//           const diffText = differences.map(d => `\n- ${d.path.join('.')}: ${d.lhs}\n+ ${d.path.join('.')}: ${d.rhs}`).join(''); 
+//           await message.reply(`Неверно! Попробуйте снова. Вот подсказка:n${diffText}`);
+//         } else {
+//           await message.reply('Правильно! Вы справились!');
+//         }
+//       } else {
+//         await message.reply('Задание для вас не установлено. Сначала используйте команду set_assignment.');
+//       }
+// }
+// async function handleClearAssignment(message) {
+//     const authorId = message.author.id;
+//     if (authorId in assignments) {
+//       delete assignments[authorId];
+//       await message.reply('Задание удалено!');
+//     } else {
+//       await message.reply('Задание не было установлено.');
+//     }
+//   }
 
 client.login(
     ""
