@@ -12,19 +12,19 @@ const commands = {
 
 client.on('ready', () => {
     console.log('Bot Ready!');
-  });
-  
+});
+
 
 client.on('message', async message => {
     if (message.author.bot) return;
     if (!message.content.startsWith(prefix)) return;
-    
+
     if (message.content === prefix) {
         // Выводим подсказку с командами
         const embed = new Discord.MessageEmbed()
             .setTitle('Доступные команды:')
             .setColor('#0099ff')
-            .setDescription(Object.entries(commands).map(([command, description]) => `${command}: ${description}`).join('\n')); 
+            .setDescription(Object.entries(commands).map(([command, description]) => `${command}: ${description}`).join('\n'));
 
         message.channel.send(embed);
         return; // Прерываем обработку сообщения
@@ -36,19 +36,19 @@ client.on('message', async message => {
     if (message.content.startsWith('!test')) {
         const question = args[0];
         const options = args.slice(1);
-    
+
         if (!question || options.length < 2) {
             return message.reply('Используйте: !test <вопрос> <вариант1> <вариант2> ...');
         }
-    
+
         const formattedOptions = options.map((option, index) => `${index + 1}. ${option}`).join('\n');
-    
+
         const embed = new Discord.MessageEmbed()
             .setTitle('Тест')
             .setColor('#0099ff')
             .setDescription(question)
             .addField('Варианты ответов', formattedOptions);
-    
+
         message.channel.send(embed)
             .then(sentMessage => {
                 options.forEach((_, index) => {
@@ -57,18 +57,18 @@ client.on('message', async message => {
             });
     }
 
-        if (message.content.startsWith('!createchannel')) {
+    if (message.content.startsWith('!createchannel')) {
         if (!message.member.permissions.has('MANAGE_CHANNELS')) {
             return message.reply('У вас нет прав на создание каналов.');
         }
-    
+
         const roleName = args[0];
         const role = message.guild.roles.cache.find(r => r.name === roleName);
-    
+
         if (!role) {
             return message.reply('Роль не найдена.');
         }
-    
+
         message.guild.channels.create(roleName, {
             type: 'text',
             permissionOverwrites: [
@@ -82,9 +82,9 @@ client.on('message', async message => {
                 }
             ]
         })
-        .then(channel => message.channel.send(`Канал для роли ${roleName} создан: ${channel}`))
-        .catch(console.error);
-    
+            .then(channel => message.channel.send(`Канал для роли ${roleName} создан: ${channel}`))
+            .catch(console.error);
+
         message.guild.channels.create(roleName, {
             type: 'voice',
             permissionOverwrites: [
@@ -98,8 +98,8 @@ client.on('message', async message => {
                 }
             ]
         })
-        .then(channel => message.channel.send(`Канал для роли ${roleName} создан: ${channel}`))
-        .catch(console.error);
+            .then(channel => message.channel.send(`Канал для роли ${roleName} создан: ${channel}`))
+            .catch(console.error);
     }
 
     if (message.content.startsWith('!getRole')) {
@@ -141,38 +141,30 @@ client.on('message', async message => {
         }
     }
 
-    // if (message.content.startsWith('!Lesson')) {
-    //     if (!message.member.permissions.has('MANAGE_CHANNELS')) {
-    //         return message.reply('У вас нет прав для выполнения этой команды.');
-    //     }
+    if (command === 'lesson') {
+        if (args.length < 3) {
+            return message.channel.send('Необходимо указать ссылку, комментарий и канал, куда отправить сообщение.');
+        }
 
-    //     const url = args[0]; 
-    //     const comment = args.slice(1).join(' '); 
-    //     const targetChannelName = args[args.length - 1]; 
+        const link = args[0];
+        const comment = args[1];
+        const channelName = args[2];
 
-    //     // Check if all arguments are provided
-    //     if (!url || !comment || !targetChannelName) {
-    //         return message.reply('Используйте: !lesson <ссылка> <комментарий> <название_канала>');
-    //     }
+        const channelId = args[2];
+        const channel = message.guild.channels.cache.get(channelId);
+        if (!channel) {
+            return message.channel.send('Указанный канал не найден.');
+        }
 
-    //     const targetChannel = message.guild.channels.cache.find(channel => channel.name === targetChannelName);
-    //     if (!targetChannel) {
-    //         return message.reply(`Канал "${targetChannelName}" не найден.`);
-    //     }
+        const embed = new Discord.MessageEmbed()
+            .setColor('#0099ff')
+            .setTitle('Урок')
+            .setURL(link)
+            .setDescription(comment);
 
-        
-    //     const embed = new MessageEmbed()
-    //         .setTitle('Урок')
-    //         .setURL(url) 
-    //         .setDescription(comment) 
-    //         .setColor('#0099ff');
-
-    //     targetChannel.send({ embeds: [embed] })
-    //         .then(() => message.reply(`Ссылка успешно отправлена в канал "${targetChannelName}"`))
-    //         .catch(error => console.error(`Ошибка отправки ссылки: ${error}`));
-    // } В разработке в будущем) Если не сопьюсь
+        channel.send(embed);
+    }
 })
-
 
 client.login(
     ""
